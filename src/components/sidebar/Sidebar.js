@@ -18,8 +18,6 @@ class Sidebar extends Component {
           </Link>
         </h1>
 
-        <img src={logo} />
-
         <ul className="sidebar-nav">
           <li className="sidebar-nav-items">Por:</li>
           <li className="sidebar-nav-items">José Guzmán</li>
