@@ -8,10 +8,6 @@ class Sidebar extends Component {
   render() {
     return (
       <div className="sidebar">
-        <div style={{ color: "black", fontWeight: "bold" }} className="tagtop">
-          {" "}
-          # emotion_recognition{" "}
-        </div>
         <h1>
           <Link smooth to="/#start" className="h1_links">
             Proyecto IA

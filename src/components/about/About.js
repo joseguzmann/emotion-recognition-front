@@ -1,14 +1,16 @@
-import React from "react";
-import classes from "./About.module.css";
-import ScrollAnimation from "react-animate-on-scroll";
-import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
 import "animate.css/animate.min.css";
-import sendAudio from "../../lib/back";
+import React, { useContext, useState, useRef } from "react";
 import ReactAudioPlayer from "react-audio-player";
-import { useState, useEffect, useContext } from "react";
-import LoadingOverlay from "react-loading-overlay";
+import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
 import LoadingContext from "../../context/loading.context";
-import { useConfirm } from "material-ui-confirm";
+import sendAudio from "../../lib/back";
+import classes from "./About.module.css";
+
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { Toast } from "primereact/toast";
+
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
 
 const About = () => {
   const recorderControls = useAudioRecorder();
@@ -17,6 +19,26 @@ const About = () => {
 
   const [audio, setAudio] = useState(null);
   const [emocion, setEmocion] = useState("No identificado");
+
+  const accept = (blob) => {
+    console.log("Enviando audio");
+    handleBlob(blob);
+  };
+
+  const reject = () => {
+    console.log("Audio no enviado");
+  };
+
+  const confirm = (blob) => {
+    confirmDialog({
+      message: "Deseas enviar el audio?",
+      header: "Analizando audio",
+      icon: "pi pi-exclamation-triangle",
+      acceptLabel: "Sí",
+      accept: () => accept(blob),
+      reject,
+    });
+  };
 
   const handleBlob = async (blob) => {
     setLoading(true);
@@ -36,29 +58,35 @@ const About = () => {
       <h2 className={classes.heading}>ABOUT</h2>
       <div className={classes.About}>
         <p>
-          Nuestro proyecto consiste en desarrollar una aplicación que permita
-          grabar el habla y analizar las emociones presentes en la misma en
-          tiempo real. Utilizando tecnología de reconocimiento de emociones,
-          nuestra aplicación podrá detectar diferentes emociones en el habla del
-          usuario, como alegría, tristeza, enojo, entre otras.
+          A continuación se presenta el front-end de nuestro proyecto,
+          construido en React, que consume el servicio de la API RESTful
+          desarrollada a partir de Flask para consumir nuestro modelo .h5 desde
+          python. Para realizar el reconocimiento se debe grabar un archivo de
+          audio, mismo que será enviado a través de un POST HTTP hacia el
+          back-end para ser analizado y a partir de ahí recuperar un string que
+          nos indique de qué tipo de emoción y genero se trata.
         </p>
+        <br />
         <p>
           Para grabar y enviar el audio se debe utilizar el siguiente
           componente:
         </p>
         <AudioRecorder
-          onRecordingComplete={(blob) => addAudioElement(blob)}
+          onRecordingComplete={(blob) => confirm(blob)}
           recorderControls={recorderControls}
         />
         <br />
         <p>El resultado de la emoción es: </p>
-        <h3>{emocion.toUpperCase()}</h3>
+        <br />
+        <h4>{emocion.toUpperCase()}</h4>
+        <br />
         <ReactAudioPlayer
           src={window.location.origin + "/music/" + audio + ".mp3"}
           autoPlay={true}
           controls
         />
       </div>
+      <ConfirmDialog />
     </div>
   );
 };
