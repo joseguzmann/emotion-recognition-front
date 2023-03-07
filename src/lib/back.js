@@ -1,4 +1,4 @@
-const sendAudio = async (blob) => {
+const postAudioData = async (blob) => {
   try {
     const audioBlob = blob;
     const formData = new FormData();
@@ -8,11 +8,15 @@ const sendAudio = async (blob) => {
       method: "POST",
       body: formData,
     });
-
-    return response;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.log(error);
+    console.error("Error posting audio data:", error);
+    return null;
   }
 };
 
-export default sendAudio;
+export default postAudioData;

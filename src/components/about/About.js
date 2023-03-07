@@ -1,5 +1,5 @@
 import "animate.css/animate.min.css";
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState } from "react";
 import ReactAudioPlayer from "react-audio-player";
 import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
 import LoadingContext from "../../context/loading.context";
@@ -7,10 +7,10 @@ import sendAudio from "../../lib/back";
 import classes from "./About.module.css";
 
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { Toast } from "primereact/toast";
 
-import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import postAudioData from "../../lib/back";
 
 const About = () => {
   const recorderControls = useAudioRecorder();
@@ -18,7 +18,7 @@ const About = () => {
   const { loading, setLoading } = useContext(LoadingContext);
 
   const [audio, setAudio] = useState(null);
-  const [emocion, setEmocion] = useState("No identificado");
+  const [texto, setTexto] = useState("No identificado");
 
   const accept = (blob) => {
     console.log("Enviando audio");
@@ -42,12 +42,22 @@ const About = () => {
 
   const handleBlob = async (blob) => {
     setLoading(true);
-    const response = await sendAudio(blob);
-    setLoading(false);
-  };
+    const response = await postAudioData(blob);
+    if (response) {
+      console.log("Emocion recibida: ", response.message);
+      // switch (response.message) {
+      //   case "female_fear":
+      //     setTexto(response.message);
+      //     setAudio("fear");
+      //     break;
 
-  const addAudioElement = (blob) => {
-    handleBlob(blob);
+      //   default:
+      //     setTexto("No identificado");
+      //     setAudio(null);
+      //     break;
+      // }
+    }
+    setLoading(false);
   };
 
   return (
@@ -78,7 +88,7 @@ const About = () => {
         <br />
         <p>El resultado de la emoción es: </p>
         <br />
-        <h4>{emocion.toUpperCase()}</h4>
+        <h4>{texto.toUpperCase()}</h4>
         <br />
         <ReactAudioPlayer
           src={window.location.origin + "/music/" + audio + ".mp3"}
